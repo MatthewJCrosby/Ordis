@@ -1,27 +1,29 @@
-version: '3.8'
-
 services:
-  web:
-    build: .
-    ports:
-      - "5000:5000"
-    volumes:
-      - .:/app
-    env_file:
-      - .env
-    depends_on:
-      - db
-    command: flask run --host=0.0.0.0 --port=5000 --reload
-
   db:
     image: postgres:15
-    restart: unless-stopped
+    restart: always
     environment:
-      POSTGRES_USER: ordis_user
-      POSTGRES_PASSWORD: ordis_pass
-      POSTGRES_DB: ordis_db
+      POSTGRES_USER: ${ORDIS_DB_USER}
+      POSTGRES_PASSWORD: ${ORDIS_DB_PASSWORD}
+      POSTGRES_DB: ${ORDIS_DB_NAME}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    command: flask run --host=0.0.0.0 --port=5000
+    volumes:
+      - .:/app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=${FLASK_ENV}
+      - FLASK_APP=${FLASK_APP}
+      - DATABASE_URL=postgresql://${ORDIS_DB_USER}:${ORDIS_DB_PASSWORD}@db:5432/${ORDIS_DB_NAME}
+    depends_on:
+      - db
 
 volumes:
   pgdata:
