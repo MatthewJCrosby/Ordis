@@ -3,7 +3,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-# Create extensions once (shared across modules)
+
 db = SQLAlchemy()
 migrate = Migrate()
 
