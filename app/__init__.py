@@ -2,6 +2,8 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_cors import CORS
+
 
 
 db = SQLAlchemy()
@@ -24,6 +26,7 @@ def create_app():
     # Import models after db is initialized to ensure they register properly
     from . import models
     migrate.init_app(app, db)
+    CORS(app)
 
     # Register blueprints or routes
     from .routes import bp as main_bp
