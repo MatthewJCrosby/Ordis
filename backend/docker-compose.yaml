@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: ${ORDIS_DB_USER}
+      POSTGRES_PASSWORD: ${ORDIS_DB_PASSWORD}
+      POSTGRES_DB: ${ORDIS_DB_NAME}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
