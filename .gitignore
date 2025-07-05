@@ -1,57 +1,40 @@
-# Python
-__pycache__/
-*.py[cod]
-*.sqlite3
-*.log
-*.pot
-*.pyc
-instance/
-.env
-.venv/
-*.env
-
-# Flask
-*.db
-migrations/
-
-# VSCode
-.vscode/
-
-# macOS
-.DS_Store
-
-# Windows
-Thumbs.db
-
-# Node / React
+# --- Node / Frontend ---
 ui/node_modules/
 ui/dist/
-ui/.next/
+ui/.vite/
 ui/.turbo/
-ui/.cache/
+ui/.storybook-static/
 ui/.eslintcache
+ui/.stylelintcache
+ui/coverage/
+ui/.biome/
 
-# Tailwind
-tailwind.config.js
-tailwind.config.ts
+# --- Python / Backend ---
+backend/__pycache__/
+backend/instance/
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.vscode/
+backend/.env
+backend/.env.*
+backend/venv/
+backend/.venv/
+*.pyc
 
-# Logs
+# --- Docker ---
+.env
+*.env
+docker-compose.override.yml
+
+# --- OS & Editor junk ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Logs ---
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Storybook
-ui/storybook-static/
-*.stories.tsx
-*.stories.js
-
-# Testing / Coverage
-coverage/
-*.lcov
-
-# Build artifacts
-build/
-dist/
-*.zip
-*.tgz
+pnpm-debug.log*
