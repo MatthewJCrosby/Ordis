@@ -1,40 +1,44 @@
-# --- Node / Frontend ---
-ui/node_modules/
-ui/dist/
-ui/.vite/
-ui/.turbo/
-ui/.storybook-static/
-ui/.eslintcache
-ui/.stylelintcache
-ui/coverage/
-ui/.biome/
-
-# --- Python / Backend ---
-backend/__pycache__/
-backend/instance/
-backend/.pytest_cache/
-backend/.mypy_cache/
-backend/.vscode/
-backend/.env
-backend/.env.*
-backend/venv/
-backend/.venv/
-*.pyc
-
-# --- Docker ---
-.env
+# Python (.venv, bytecode, logs, etc.)
+*.py[cod]
+__pycache__/
+*.sqlite3
+*.log
 *.env
-docker-compose.override.yml
+.env.*
+.venv/
+venv/
 
-# --- OS & Editor junk ---
+# Flask / Alembic
+instance/
+migrations/__pycache__/
+alembic.ini
+
+# Node (React, Vite, Tailwind, Storybook, etc.)
+node_modules/
+dist/
+build/
+.vite/
+.storybook-out/
+coverage/
+*.tsbuildinfo
+
+# OS/System
 .DS_Store
 Thumbs.db
+
+# Editor/IDE
 .vscode/
 .idea/
 
-# --- Logs ---
-*.log
+# Docker
+*.pid
+*.sock
+docker-compose.override.yml
+.env.docker
+
+# Misc
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
+package-lock.json
+pnpm-lock.yaml
