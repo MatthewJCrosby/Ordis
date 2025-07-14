@@ -3,11 +3,14 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
+from dotenv import load_dotenv
 
 from ariadne import graphql_sync, make_executable_schema, load_schema_from_path
 from ariadne.explorer import ExplorerGraphiQL
 
-from .resolvers import query  # assumes resolvers.py has a QueryType() instance
+from app.models import db  
+from app.models import load_models  # helper that dynamically imports all model files
+from .resolvers import query
 
 # Initialize SQLAlchemy and Migrate
 db = SQLAlchemy()
@@ -18,6 +21,7 @@ type_defs = load_schema_from_path(os.path.join(os.path.dirname(__file__), "schem
 schema = make_executable_schema(type_defs, query)
 
 def create_app():
+    load_dotenv()
     app = Flask(__name__)
     CORS(app)
 
@@ -31,8 +35,9 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    # Optional: Import models to register them with SQLAlchemy
-    from . import models
+    # Dynamically import all models from models folder
+    with app.app_context():
+        load_models()
 
     # GraphQL GET (GraphiQL UI)
     @app.route("/graphql", methods=["GET"])

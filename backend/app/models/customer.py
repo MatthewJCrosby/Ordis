@@ -7,3 +7,5 @@ class Customer(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False)
     
+    orders = db.relationship("Order", back_populates="customer", cascade="all, delete")
+    
