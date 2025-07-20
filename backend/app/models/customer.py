@@ -8,4 +8,5 @@ class Customer(db.Model):
     email = db.Column(db.String(100), nullable=False)
     
     orders = db.relationship("Order", back_populates="customer", cascade="all, delete")
+    service_requests = db.relationship("ServiceRequest", back_populates="customer")
     

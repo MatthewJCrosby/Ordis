@@ -8,4 +8,5 @@ class Product(db.Model):
     product_description = db.Column(db.String(5000), nullable=True)
     product_price = db.Column(db.Numeric(10,2), nullable=False)
     stock = db.Column(db.Integer, nullable=True)
+    line_items = db.relationship("LineItem", back_populates="product")
     

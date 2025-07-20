@@ -12,3 +12,5 @@ def load_models():
             importlib.import_module(module_name)
 
 load_models()
+
+from .customer import Customer
