@@ -2,7 +2,7 @@ import importlib
 import pkgutil
 from pathlib import Path
 
-RESOLVER_PACKAGE = "graphql.resolvers"
+RESOLVER_PACKAGE = "gql.resolvers"
 
 # dynamically grabs all resolver files at runtime
 def discover_resolvers():

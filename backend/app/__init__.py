@@ -4,6 +4,8 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
+from gql.bindables import bindables
+from gql.schema import load_type_defs
 
 from ariadne import graphql_sync, make_executable_schema, load_schema_from_path
 from ariadne.explorer import ExplorerGraphiQL
@@ -31,8 +33,9 @@ def create_app():
     with app.app_context():
         load_models()
 
-    type_defs = load_schema_from_path(os.path.join(os.path.dirname(__file__), "schema.graphql"))
-    schema = make_executable_schema(type_defs, query)
+    type_defs = load_type_defs()
+    schema = make_executable_schema(type_defs, *bindables)
+
 
     @app.route("/graphql", methods=["GET"])
     def graphql_playground():
