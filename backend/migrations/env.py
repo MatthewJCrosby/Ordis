@@ -14,6 +14,12 @@ config = context.config
 fileConfig(config.config_file_name)
 logger = logging.getLogger('alembic.env')
 
+#  Import and load your models here
+from app.models import db, load_models
+load_models()
+
+# Set the target metadata once, globally
+target_metadata = db.metadata
 
 def get_engine():
     try:
