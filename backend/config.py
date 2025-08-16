@@ -5,6 +5,12 @@ class BaseConfig:
     JSON_SORT_KEYS = False
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 
+    DATABASE_URL = os.environ.get(
+        "DATABASE_URL", 
+        "sqlite:///instance/ordis.db",
+    )
+    SQL_ECHO = os.environ.get("SQL_ECHO", "false").lower() == "true"
+
 class DevConfig(BaseConfig):
     DEBUG =True
     LOG_LEVEL = "DEBUG"
