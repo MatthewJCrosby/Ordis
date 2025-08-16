@@ -1,5 +1,7 @@
 from flask import Flask
 import logging
+from flask_magql import MagqlExtension
+from .gql import schema
 
 def create_app(config_object="config.DevConfig"):
     app = Flask(__name__, instance_relative_config=True)
@@ -27,7 +29,7 @@ def create_app(config_object="config.DevConfig"):
     from .health import bp as health_bp
     app.register_blueprint(health_bp)
 
-
+    MagqlExtension(schema).init_app(app)
 
     @app.errorhandler(404)
     def handle_404(e):
