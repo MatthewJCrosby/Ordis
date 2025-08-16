@@ -2,8 +2,12 @@ from flask import Flask, g
 import logging
 from flask_magql import MagqlExtension
 from .gql import schema
-from .db import get_session
+from .db import get_session, Base
+from flask_migrate import Migrate
 from sqlalchemy import text
+
+
+migrate = Migrate(compare_type=True)
 
 def create_app(config_object="config.DevConfig"):
     app = Flask(__name__, instance_relative_config=True)
@@ -61,9 +65,9 @@ def create_app(config_object="config.DevConfig"):
         return {"error": "Not Found"}, 404
     
     @app.errorhandler(500)
-    def handle_404(e):
+    def handle_500(e):
         return {"error": "Server Error"}, 500
     
-    
+    migrate.init_app(app, directory="migrations", metadata=Base.metadata)
     return app
 
