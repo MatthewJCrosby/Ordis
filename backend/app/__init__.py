@@ -1,7 +1,9 @@
-from flask import Flask
+from flask import Flask, g
 import logging
 from flask_magql import MagqlExtension
 from .gql import schema
+from .db import get_session
+from sqlalchemy import text
 
 def create_app(config_object="config.DevConfig"):
     app = Flask(__name__, instance_relative_config=True)
@@ -17,6 +19,24 @@ def create_app(config_object="config.DevConfig"):
         root.addHandler(handler)
     root.setLevel(getattr(logging, app.config["LOG_LEVEL"], logging.INFO))
 
+
+    @app.before_request
+    def _open_session():
+        g.db = get_session()
+
+    @app.teardown_appcontext
+    def _close_session(exc):
+        session = getattr(g, "db", None)
+        if session is not None:
+            try:
+                if exc is None:
+                    session.commit()
+                else:
+                    session.rollback()
+            finally:
+                session.close()
+    
+
     @app.get("/")
     def home():
         return {"status": "ok"}
@@ -25,6 +45,11 @@ def create_app(config_object="config.DevConfig"):
     def logger():
         app.logger.debug("Logger Message Example")
         return {"status": "ok"}
+    
+    @app.get("/pingdb")
+    def ping_db():
+        res = g.db.execute(text("select 1")).scalar_one()
+        return {"db": res}
     
     from .health import bp as health_bp
     app.register_blueprint(health_bp)
