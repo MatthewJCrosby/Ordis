@@ -3,10 +3,10 @@ import magql
 
 GQLCustomer = magql.Object("Customer", fields={
     "id": "ID!",
-    "name": "String!",
+    "first_name": "String!",
+    "last_name": "String!",
     "email": "String!",
-    "phone": "String!",
-    "created_at": "DateTime",
+    "created_on": "DateTime",
 })
 
 schema.add_type(GQLCustomer)
