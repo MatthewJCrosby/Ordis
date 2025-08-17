@@ -11,6 +11,10 @@ class BaseConfig:
     )
     SQL_ECHO = os.environ.get("SQL_ECHO", "false").lower() == "true"
 
+    DEFAULT_PAGE_SIZE = 25
+    MAX_PAGE_SIZE = 500
+    PAGE_SIZE_CHOICES = (10,25,50,100,500)
+
 class DevConfig(BaseConfig):
     DEBUG =True
     LOG_LEVEL = "DEBUG"
