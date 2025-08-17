@@ -13,7 +13,17 @@ CustomerCreateInput = magql.InputObject(
     "email": "String!",
     },
 )
+
+CustomerUpdateInput = magql.InputObject(
+    "CustomerUpdateInput", fields={
+    "first_name": "String",
+    "last_name": "String",
+    "email": "String",
+    },
+)
+
 schema.add_type(CustomerCreateInput)
+schema.add_type(CustomerUpdateInput)
 
 @schema.mutation.field("createCustomer", "Customer", args={"input": "CustomerCreateInput!"})
 def resolve_create_customer(_, infor, input):
@@ -28,5 +38,39 @@ def resolve_create_customer(_, infor, input):
     g.db.flush()
 
     return c
+
+@schema.mutation.field("updateCustomer", "Customer", args={"id": "ID!", "input":"CustomerUpdateInput!"})
+def resolve_update_customer(_, info, *, id, input):
+    c =  g.db.execute(select(Customer).where(Customer.id == id)).scalar_one_or_none()
+    if not c:
+        raise ValueError("Customer not found")
+    if input["first_name"] is not None:
+        c.first_name = input["first_name"]
+    if input["last_name"] is not None:
+        c.last_name = input["last_name"]
+    if "email" in input:
+        c.email = input["email"]
+
+    try:
+        g.db.flush()
+    except IntegrityError as e:
+        g.db.rollback()
+
+        raise ValueError("email already in use")
+    return c
+
+
+
+
+@schema.mutation.field("deleteCustomer", "Boolean!", args={"id":"ID!"})
+def resolve_delete_customer(_, infor, *, id):
+    c = g.db.execute(select(Customer).where(Customer.id == id)).scalar_one_or_none()
+    if not c:
+        return False
+    
+    g.db.delete(c)
+    return True
+    
+
 
     
