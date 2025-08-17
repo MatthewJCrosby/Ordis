@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from sqlalchemy import text
 
 
+
 migrate = Migrate(compare_type=True)
 
 def create_app(config_object="config.DevConfig"):
@@ -68,6 +69,7 @@ def create_app(config_object="config.DevConfig"):
     def handle_500(e):
         return {"error": "Server Error"}, 500
     
+    from . import models
     migrate.init_app(app, directory="migrations", metadata=Base.metadata)
     return app
 

@@ -12,7 +12,7 @@ NAMING = MetaData(naming_convention={
 })
 
 class Base(DeclarativeBase):
-    pass
+    metadata = NAMING
 
 def _engine():
     url = current_app.config["DATABASE_URL"]
