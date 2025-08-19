@@ -1,4 +1,6 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from __future__ import annotations
+from typing import Optional
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, DateTime, func
 from app.db import Base
 
@@ -10,3 +12,6 @@ class Customer(Base):
     last_name: Mapped[str] = mapped_column(String(120), nullable=False)
     email: Mapped[str | None] = mapped_column(String(255), unique=True)
     created_on: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    orders = relationship("Order", back_populates="customer", lazy="selectin", cascade="all, delete-orphan", passive_deletes=True)
+    
+
