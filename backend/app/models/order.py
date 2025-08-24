@@ -12,7 +12,7 @@ class Order(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     customer_id: Mapped[int] = mapped_column(ForeignKey("customers.id"), nullable=False, index=True)
     customer = relationship("Customer", back_populates="orders", lazy="selectin")
-    employee_id: Mapped[int | None] = mapped_column(ForeignKey("employees.id", ondelete="SET NULL"), index=True)
+    tech_id: Mapped[int | None] = mapped_column(ForeignKey("employees.id", ondelete="SET NULL"), index=True, nullable=True)
     service_tech = relationship("Employee", back_populates="orders", lazy="selectin")
     line_items = relationship("LineItem", back_populates="order", lazy="selectin", cascade="all, delete-orphan", passive_deletes=True)
 

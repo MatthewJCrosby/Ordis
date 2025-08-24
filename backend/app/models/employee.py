@@ -19,6 +19,6 @@ class Employee(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     department: Mapped[DepartmentEnum] = mapped_column(Enum(DepartmentEnum, name="department_enum"), nullable=False)
-    price: Mapped[Decimal] = mapped_column(Numeric(10,2), nullable=False)
-    line_items = relationship("LineItem", back_populates="products", lazy="selectin")
-    orders = relationship("Order", back_populates="employees", lazy="selectin")
+    orders = relationship("Order", back_populates="service_tech", lazy="selectin")
+    
+    

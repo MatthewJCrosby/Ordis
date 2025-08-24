@@ -14,4 +14,4 @@ class Product(Base):
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=True)
     price: Mapped[Decimal] = mapped_column(Numeric(10,2), nullable=False)
-    line_items = relationship("LineItem", back_populates="products", lazy="selectin")
+    line_items = relationship("LineItem", back_populates="product", lazy="selectin")
