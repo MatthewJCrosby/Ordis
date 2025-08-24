@@ -13,8 +13,8 @@ def resolve_product(parent, info, **kwargs):
 
 
 @schema.query.field("products", "[Product!]", args={"limit": "Int", "offset": "Int"})
-def resolve_products(parent, info, limit=None, offset=None):
-    limit, offset = normalize_pagination(limit, offset)
+def resolve_products(parent, info, **kwargs):
+    limit, offset = normalize_pagination(kwargs.get("limit"), kwargs.get("offset"))
     query = select(Product).order_by(Product.id).limit(limit).offset(offset)
     return g.db.execute(query).scalars().all()
 

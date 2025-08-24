@@ -26,7 +26,8 @@ schema.add_type(CustomerCreateInput)
 schema.add_type(CustomerUpdateInput)
 
 @schema.mutation.field("createCustomer", "Customer", args={"input": "CustomerCreateInput!"})
-def resolve_create_customer(_, infor, input):
+def resolve_create_customer(parent, info, **kwargs):
+    input = kwargs["input"]
     first_name = (input.get("first_name") or "").strip()
     last_name = (input.get("last_name") or "").strip()
     email = (input.get("email") or "").strip()
@@ -40,13 +41,15 @@ def resolve_create_customer(_, infor, input):
     return c
 
 @schema.mutation.field("updateCustomer", "Customer", args={"id": "ID!", "input":"CustomerUpdateInput!"})
-def resolve_update_customer(_, info, *, id, input):
+def resolve_update_customer(parent, info, **kwargs):
+    id = kwargs["id"]
+    input = kwargs["input"]
     c =  g.db.execute(select(Customer).where(Customer.id == id)).scalar_one_or_none()
     if not c:
         raise ValueError("Customer not found")
-    if input["first_name"] is not None:
+    if input.get("first_name") is not None:
         c.first_name = input["first_name"]
-    if input["last_name"] is not None:
+    if input.get("last_name") is not None:
         c.last_name = input["last_name"]
     if "email" in input:
         c.email = input["email"]
@@ -63,7 +66,8 @@ def resolve_update_customer(_, info, *, id, input):
 
 
 @schema.mutation.field("deleteCustomer", "Boolean!", args={"id":"ID!"})
-def resolve_delete_customer(_, infor, *, id):
+def resolve_delete_customer(parent, info, **kwargs):
+    id = kwargs["id"]
     c = g.db.execute(select(Customer).where(Customer.id == id)).scalar_one_or_none()
     if not c:
         return False

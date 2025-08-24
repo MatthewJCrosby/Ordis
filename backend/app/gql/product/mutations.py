@@ -27,7 +27,8 @@ schema.add_type(ProductCreateInput)
 schema.add_type(ProductUpdateInput)
 
 @schema.mutation.field("createProduct", "Product", args={"input": "ProductCreateInput!"})
-def resolve_create_product(parent, info, input):
+def resolve_create_product(parent, info, **kwargs):
+    input = kwargs["input"]
     name = (input.get("name") or "").strip()
     description = (input.get("description") or "").strip()
     price = (input.get("price") or "").strip()
@@ -43,7 +44,9 @@ def resolve_create_product(parent, info, input):
 
 
 @schema.mutation.field("updateProduct", "Product", args={"id": "ID!", "input":"ProductUpdateInput"})
-def resolve_update_product(parent, info, *, id, input):
+def resolve_update_product(parent, info, **kwargs):
+    id = kwargs["id"]
+    input = kwargs["input"]
     product = g.db.execute(select(Product).where(Product.id == id)).scalar_one_or_none()
     if not product:
         raise ValueError("Product not found")
@@ -63,7 +66,8 @@ def resolve_update_product(parent, info, *, id, input):
 
 
 @schema.mutation.field("deleteProduct", "Boolean!", args={"id": "ID!"})
-def resolve_delete_product(parent, info, *, id):
+def resolve_delete_product(parent, info, **kwargs):
+    id = kwargs["id"]
     product = g.db.execute(select(Product).where(Product.id == id)).scalar_one_or_none()
     if not product:
         raise ValueError("Product not found")
