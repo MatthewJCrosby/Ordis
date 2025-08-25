@@ -36,6 +36,7 @@ def resolve_create_employee(parent, info, **kwargs):
     employee = Employee(name=name, department=department)
     g.db.add(employee)
     g.db.flush()
+    g.db.commit()
     return employee
 
 @schema.mutation.field("updateEmployee", "Employee", args={"id": "ID!", "input":"EmployeeUpdateInput"})
@@ -51,6 +52,7 @@ def resolve_employee_update(parent, info, **kwargs):
         employee.department = (input["department"] or "").strip()
     g.db.add(employee)
     g.db.flush()
+    g.db.commit()
     return employee
 
 
@@ -62,4 +64,5 @@ def resolve_employee_delete(parent, info, **kwargs):
         raise ValueError("Employee not found")
     g.db.delete(employee)
     g.db.flush()
+    g.db.commit()
     return True

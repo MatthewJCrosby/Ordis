@@ -39,6 +39,7 @@ def resolve_create_product(parent, info, **kwargs):
     product = Product(name=name, description=description, price=price)
     g.db.add(product)
     g.db.flush()
+    g.db.commit()
 
     return product
 
@@ -59,6 +60,7 @@ def resolve_update_product(parent, info, **kwargs):
 
     try:
         g.db.flush()
+        g.db.commit()
     except:
         g.db.rollback()
         raise ValueError("an error with one of the inputs")
@@ -72,5 +74,6 @@ def resolve_delete_product(parent, info, **kwargs):
     if not product:
         raise ValueError("Product not found")
     g.db.delete(product)
+    g.db.commit()
     return True
 

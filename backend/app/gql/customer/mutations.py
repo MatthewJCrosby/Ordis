@@ -37,6 +37,7 @@ def resolve_create_customer(parent, info, **kwargs):
     c = Customer(first_name=first_name, last_name=last_name, email=email)
     g.db.add(c)
     g.db.flush()
+    g.db.commit()
 
     return c
 
@@ -56,6 +57,7 @@ def resolve_update_customer(parent, info, **kwargs):
 
     try:
         g.db.flush()
+        g.db.commit()
     except IntegrityError as e:
         g.db.rollback()
 
@@ -73,6 +75,7 @@ def resolve_delete_customer(parent, info, **kwargs):
         return False
     
     g.db.delete(c)
+    g.db.commit()
     return True
     
 
