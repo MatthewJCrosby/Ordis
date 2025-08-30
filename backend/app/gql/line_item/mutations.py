@@ -1,7 +1,7 @@
 from flask import g
 from sqlalchemy import select   
 from sqlalchemy.exc import IntegrityError
-from app.models.LineItem import LineItem
+from app.models.line_item import LineItem
 from .. import schema
 import magql
 
@@ -29,7 +29,7 @@ schema.add_type(LineItemCreateInput)
 schema.add_type(LineItemUpdateInput)    
 
 @schema.mutation.field("createLineItem", "LineItem", args={"input":"CreateLineItemInput!"})
-def resolve_create_line_item(parent, info, kwargs):
+def resolve_create_line_item(parent, info, **kwargs):
     input_data = kwargs["input"]
     line_item = LineItem(
         product_id=input_data["product_id"],
@@ -47,7 +47,7 @@ def resolve_create_line_item(parent, info, kwargs):
     return line_item
 
 @schema.mutation.field("updateLineItem", "LineItem", args={"id":"ID!", "input": "UpdateLineItemInput!"})
-def resolve_update_line_item(parent, info, kwargs):
+def resolve_update_line_item(parent, info, **kwargs):
     line_item_id = kwargs["id"]
     input_data = kwargs["input"]
     line_item = g.db.execute(select(LineItem).where(LineItem.id == line_item_id)).scalar_one_or_none()
