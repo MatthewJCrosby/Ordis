@@ -28,7 +28,7 @@ LineItemUpdateInput = magql.InputObject(
 schema.add_type(LineItemCreateInput)
 schema.add_type(LineItemUpdateInput)    
 
-@schema.mutation.field("createLineItem", "LineItem", args={"input":"CreateLineItemInput!"})
+@schema.mutation.field("createLineItem", "LineItem", args={"input":"LineItemCreateInput!"})
 def resolve_create_line_item(parent, info, **kwargs):
     input_data = kwargs["input"]
     line_item = LineItem(
@@ -46,7 +46,7 @@ def resolve_create_line_item(parent, info, **kwargs):
         raise Exception("Failed to create line item")
     return line_item
 
-@schema.mutation.field("updateLineItem", "LineItem", args={"id":"ID!", "input": "UpdateLineItemInput!"})
+@schema.mutation.field("updateLineItem", "LineItem", args={"id":"ID!", "input": "LineItemUpdateInput!"})
 def resolve_update_line_item(parent, info, **kwargs):
     line_item_id = kwargs["id"]
     input_data = kwargs["input"]
@@ -68,17 +68,17 @@ def resolve_update_line_item(parent, info, **kwargs):
         raise Exception("Failed to update line item")
     return line_item
 
-    @schema.mutation.field("deleteLineItem", "Boolean!", args={"id": "ID!"})
-    def resolve_delete_line_item(parent, info, kwargs):
-        line_item_id = kwargs["id"]
-        line_item = g.db.execute(select(LineItem).where(LineItem.id == line_item_id)).scalar_one_or_none()
-        if not line_item:
-            raise Exception("Line item not found")
-        g.db.delete(line_item)
-        try:
-            g.db.flush()
-            g.db.commit()
-        except IntegrityError:
-            g.db.rollback()
-            raise Exception("Failed to delete line item")
-        return True
+@schema.mutation.field("deleteLineItem", "Boolean!", args={"id": "ID!"})
+def resolve_delete_line_item(parent, info, **kwargs):
+    line_item_id = kwargs["id"]
+    line_item = g.db.execute(select(LineItem).where(LineItem.id == line_item_id)).scalar_one_or_none()
+    if not line_item:
+        raise Exception("Line item not found")
+    g.db.delete(line_item)
+    try:
+        g.db.flush()
+        g.db.commit()
+    except IntegrityError:
+        g.db.rollback()
+        raise Exception("Failed to delete line item")
+    return True
