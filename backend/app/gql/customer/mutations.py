@@ -1,6 +1,9 @@
 from flask import g
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+
+from app.utils import commit_or_rollback
+from app.gql.utils import get_entity, update_entity
 from .. import schema
 from app.models.customer import Customer
 import magql
@@ -11,6 +14,7 @@ CustomerCreateInput = magql.InputObject(
     "first_name": "String!",
     "last_name": "String!",
     "email": "String!",
+    "phone": "String"
     },
 )
 
@@ -19,6 +23,7 @@ CustomerUpdateInput = magql.InputObject(
     "first_name": "String",
     "last_name": "String",
     "email": "String",
+    "phone": "String",
     },
 )
 
@@ -27,55 +32,32 @@ schema.add_type(CustomerUpdateInput)
 
 @schema.mutation.field("createCustomer", "Customer", args={"input": "CustomerCreateInput!"})
 def resolve_create_customer(parent, info, **kwargs):
-    input = kwargs["input"]
-    first_name = (input.get("first_name") or "").strip()
-    last_name = (input.get("last_name") or "").strip()
-    email = (input.get("email") or "").strip()
-    if not first_name or not last_name or not email:
-        raise ValueError("First & Last name, email required")
-    
-    c = Customer(first_name=first_name, last_name=last_name, email=email)
-    g.db.add(c)
-    g.db.flush()
-    g.db.commit()
+    input_data = kwargs["input"]
 
-    return c
+    customer = Customer(**input_data)
+    g.db.add(customer)
+    commit_or_rollback("Customer", "create")
+    return customer
 
 @schema.mutation.field("updateCustomer", "Customer", args={"id": "ID!", "input":"CustomerUpdateInput!"})
 def resolve_update_customer(parent, info, **kwargs):
     id = kwargs["id"]
-    input = kwargs["input"]
-    c =  g.db.execute(select(Customer).where(Customer.id == id)).scalar_one_or_none()
-    if not c:
-        raise ValueError("Customer not found")
-    if input.get("first_name") is not None:
-        c.first_name = input["first_name"]
-    if input.get("last_name") is not None:
-        c.last_name = input["last_name"]
-    if "email" in input:
-        c.email = input["email"]
+    input_data = kwargs["input"]
+    customer =  get_entity(Customer, id)
 
-    try:
-        g.db.flush()
-        g.db.commit()
-    except IntegrityError as e:
-        g.db.rollback()
+    update_entity(customer, input_data, allowed_fields=["first_name", "last_name", "email", "phone"])
+    commit_or_rollback("Customer", "update")
 
-        raise ValueError("email already in use")
-    return c
-
-
-
+    return customer
 
 @schema.mutation.field("deleteCustomer", "Boolean!", args={"id":"ID!"})
 def resolve_delete_customer(parent, info, **kwargs):
     id = kwargs["id"]
-    c = g.db.execute(select(Customer).where(Customer.id == id)).scalar_one_or_none()
-    if not c:
-        return False
-    
-    g.db.delete(c)
-    g.db.commit()
+    customer = get_entity(Customer, id)
+
+    g.db.delete(customer)
+    commit_or_rollback("Customer", "delete")
+
     return True
     
 

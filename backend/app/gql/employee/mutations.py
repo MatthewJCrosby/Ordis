@@ -1,6 +1,6 @@
 from flask import g
-from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
+from app.utils import commit_or_rollback
+from app.gql.utils import get_entity, update_entity
 from .. import schema
 from app.models.employee import Employee
 import magql
@@ -26,43 +26,29 @@ schema.add_type(EmployeeUpdateInput)
 
 @schema.mutation.field("createEmployee", "Employee", args={"input": "EmployeeCreateInput!"})
 def resolve_create_employee(parent, info, **kwargs):
-    input = kwargs["input"]
-    name = (input.get("name") or "").strip()
-    department = (input.get("department") or "").strip()
-
-    if not name or not department:
-        raise ValueError("Name and department are required!")
+    input_data = kwargs["input"]
     
-    employee = Employee(name=name, department=department)
+    employee = Employee(**input_data)
     g.db.add(employee)
-    g.db.flush()
-    g.db.commit()
+    commit_or_rollback("Employee", "create")
     return employee
 
 @schema.mutation.field("updateEmployee", "Employee", args={"id": "ID!", "input":"EmployeeUpdateInput"})
 def resolve_employee_update(parent, info, **kwargs):
-    input = kwargs["input"]
+    input_data = kwargs["input"]
     employee_id = kwargs["id"]
-    employee = g.db.execute(select(Employee).where(Employee.id == employee_id)).scalar_one_or_none()
-    if not employee:
-        raise ValueError("Employee not found")
-    if input.get("name") is not None:
-        employee.name = (input["name"] or "").strip()
-    if input.get("department") is not None:
-        employee.department = (input["department"] or "").strip()
-    g.db.add(employee)
-    g.db.flush()
-    g.db.commit()
+    employee = get_entity(Employee, employee_id)
+    
+    update_entity(employee, input_data, allowed_fields=["name", "department"])
+    commit_or_rollback("Employee", "update")
+
     return employee
 
 
 @schema.mutation.field("deleteEmployee", "Boolean!", args={"id": "ID!"})
 def resolve_employee_delete(parent, info, **kwargs):
     employee_id = kwargs["id"]
-    employee = g.db.execute(select(Employee).where(Employee.id == employee_id)).scalar_one_or_none()
-    if not employee:
-        raise ValueError("Employee not found")
+    employee = get_entity(Employee, employee_id)
     g.db.delete(employee)
-    g.db.flush()
-    g.db.commit()
+    commit_or_rollback("Employee", "delete")
     return True
