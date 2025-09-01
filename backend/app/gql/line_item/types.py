@@ -6,5 +6,10 @@ GQLLineItem = magql.Object("LineItem", fields={
     "order": "Order!",
     "product": "Product!",
     "qty": "Int!",
+    "name": "String!",
+    "description": "String",
+    "price": "Decimal!"
 
 })
+
+schema.add_type(GQLLineItem)

@@ -13,10 +13,14 @@ class Order(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     customer_id: Mapped[int] = mapped_column(ForeignKey("customers.id"), nullable=False, index=True)
     customer = relationship("Customer", back_populates="orders", lazy="selectin")
-    tech_id: Mapped[int | None] = mapped_column(ForeignKey("employees.id", ondelete="SET NULL"), index=True, nullable=True)
+    service_tech_id: Mapped[int | None] = mapped_column(ForeignKey("employees.id", ondelete="SET NULL"), index=True, nullable=True)
     service_tech = relationship("Employee", back_populates="orders", lazy="selectin")
     line_items = relationship("LineItem", back_populates="order", lazy="selectin", cascade="all, delete-orphan", passive_deletes=True)
     total: Mapped[Decimal] = mapped_column(Numeric(10,2), nullable=True)
 
-def update_total(self):
-    self.total = sum(item.price * item.quantity for item in self.line_items)
+    def update_total(self): 
+        if not self.line_items:
+            self.total = Decimal('0.00')
+        else:
+            total_value = sum(item.price * item.qty for item in self.line_items)
+            self.total = Decimal(str(total_value))

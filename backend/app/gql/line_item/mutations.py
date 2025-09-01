@@ -21,9 +21,8 @@ LineItemCreateInput = magql.InputObject(
 LineItemUpdateInput = magql.InputObject(
     "LineItemUpdateInput",
     fields={
-        "product_id": "ID",
         "qty": "Int",
-        "order_id": "ID",
+        "price": "Decimal"
     }
 )
 
@@ -44,9 +43,10 @@ def resolve_create_line_item(parent, info, **kwargs):
     line_item = LineItem(**line_item_data)
 
     g.db.add(line_item)
+    g.db.flush()
     line_item.order.update_total()
     commit_or_rollback("LineItem", "create")
-
+    g.db.refresh(line_item)
     return line_item
 
 
@@ -56,10 +56,11 @@ def resolve_update_line_item(parent, info, **kwargs):
     input_data = kwargs["input"]
     line_item = get_entity(LineItem, line_item_id)
 
-    update_entity(line_item, input_data, allowed_fields=["qty", "product_id", "order_id"])
+    update_entity(line_item, input_data, allowed_fields=["qty", "price"])
 
     line_item.order.update_total()
     commit_or_rollback("LineItem", "update")
+    g.db.refresh(line_item)
     return line_item
 
 

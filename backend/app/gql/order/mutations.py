@@ -38,6 +38,7 @@ def resolve_update_order(parent, info, **kwargs):
     order = get_entity(Order, order_id)
     update_entity(order, input_data, allowed_fields=["service_tech_id"])
     commit_or_rollback("Order", "update")
+    g.db.refresh(order)
     return order
 
 @schema.mutation.field("deleteOrder", "Boolean!", args={"id": "ID!"})
