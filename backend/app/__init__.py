@@ -1,10 +1,14 @@
-from flask import Flask, g
+from uuid import uuid4
+from flask import Flask, g, request
 import logging
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask_magql import MagqlExtension
 from .gql import schema
 from .db import get_session, Base
 from flask_migrate import Migrate
 from sqlalchemy import text
+from flask_cors import CORS
 
 
 
@@ -15,6 +19,58 @@ def create_app(config_object="config.DevConfig"):
     app.config.from_object(config_object)
     app.config.from_pyfile("settings.py", silent=True)
 
+    CORS(app, resources= {
+        r"/graphql": {
+            "origins": app.config.get("CORS_ORIGINS", ["http://localhost:3000"]),
+            "methods": ["GET", "POST", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True
+        }
+    })
+
+    limiter = Limiter(key_func=get_remote_address, default_limits=["500 per day", "50 per hour"])
+    limiter.init_app(app)
+ 
+    @app.before_request
+    def request_id():
+        #assign an id, log the request, open the session
+        g.request_id = str(uuid4())
+        app.logger.info(f"Request {g.request_id}: {request.method} {request.path}")
+        g.db = get_session()
+    
+
+    @app.after_request
+    def set_security_headers(response):
+        response.headers["X-Request-ID"] = g.request_id
+
+        #standard headers
+        headers = {
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "DENY",
+            "X-XSS-Protection": "1; mode=block",
+            "Referrer-Policy": "no-referrer",
+            "X-Download-Options": "noopen",
+            "X-Permitted-Cross-Domain-Policies": "none"
+        }
+
+        #CSP Policy
+        if app.config.get('ENABLE_CSP', True):
+            headers["Content-Security-Policy"] = (
+               "default-src 'self'; "
+               "script-src 'self'; "
+               "style-src 'self'; "
+               "img-src 'self' data:; "
+               "connect-src 'self'" 
+            )
+
+        #production only headers
+        if not app.debug and app.config.get('ENABLE_HSTS', True):
+            headers["Strict-Transport-Security"] = ("max-age=31536000; includeSubDomains; preload")
+
+        for header, value in headers.items():
+            response.headers[header] = value
+
+        return response
 
     root = logging.getLogger()
     if not root.handlers:
@@ -24,10 +80,6 @@ def create_app(config_object="config.DevConfig"):
         root.addHandler(handler)
     root.setLevel(getattr(logging, app.config["LOG_LEVEL"], logging.INFO))
 
-
-    @app.before_request
-    def _open_session():
-        g.db = get_session()
 
     @app.teardown_appcontext
     def _close_session(exc):
@@ -43,6 +95,7 @@ def create_app(config_object="config.DevConfig"):
     
 
     @app.get("/")
+    @limiter.limit("10 per minute")
     def home():
         return {"status": "ok"}
     
@@ -52,6 +105,7 @@ def create_app(config_object="config.DevConfig"):
         return {"status": "ok"}
     
     @app.get("/pingdb")
+    @limiter.limit("5 per minute")
     def ping_db():
         res = g.db.execute(text("select 1")).scalar_one()
         return {"db": res}
@@ -69,7 +123,12 @@ def create_app(config_object="config.DevConfig"):
     def handle_500(e):
         return {"error": "Server Error"}, 500
     
+    @app.errorhandler(429)
+    def handle_rate_limit_exceeded(e):
+        app.logger.warning(f"Rate limit exceeded for request {g.get('request_id', 'unknown')}")
+        return {"error": "Rate limit exceeded", "request_id": g.request_id}, 429
+    
     from . import models
     migrate.init_app(app, directory="migrations", metadata=Base.metadata)
-    return app
+    return app 
 
