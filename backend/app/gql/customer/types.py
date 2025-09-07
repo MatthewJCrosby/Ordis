@@ -3,9 +3,9 @@ import magql
 
 GQLCustomer = magql.Object("Customer", fields={
     "id": "ID!",
-    "first_name": "String!",
-    "last_name": "String!",
-    "email": "String!",
+    "user_id": "ID!",
+    "user": "User",
+    "orders": "[Order]",
     "created_on": "DateTime",
 })
 

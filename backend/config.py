@@ -12,6 +12,10 @@ class BaseConfig:
     JSON_SORT_KEYS = False
     LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 
+    JWT_SECRET_KEY = os.environ.get("JTW-SECRET_KEY", "dev-jwt-insecure")
+    JWT_ACCESS_TOKEN_EXPIRES = 900
+    JWT_REFRESH_TOKEN_EXPIRES = 86400
+
     DATABASE_URL = os.environ.get(
         "DATABASE_URL", 
         "sqlite:///instance/ordis.db",

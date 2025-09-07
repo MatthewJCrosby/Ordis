@@ -9,6 +9,8 @@ from .db import get_session, Base
 from flask_migrate import Migrate
 from sqlalchemy import text
 from flask_cors import CORS
+from . import cli
+from flask_jwt_extended import JWTManager
 
 
 
@@ -16,9 +18,10 @@ migrate = Migrate(compare_type=True)
 
 def create_app(config_object="config.DevConfig"):
     app = Flask(__name__, instance_relative_config=True)
+    jwt = JWTManager(app)
     app.config.from_object(config_object)
     app.config.from_pyfile("settings.py", silent=True)
-
+    app.cli.add_command(cli.create_admin)
     CORS(app, resources= {
         r"/graphql": {
             "origins": app.config.get("CORS_ORIGINS", ["http://localhost:3000"]),
@@ -111,7 +114,9 @@ def create_app(config_object="config.DevConfig"):
         return {"db": res}
     
     from .health import bp as health_bp
+    from.auth import auth_bp
     app.register_blueprint(health_bp)
+    app.register_blueprint(auth_bp, url_prefix="/auth")
 
     MagqlExtension(schema).init_app(app)
 

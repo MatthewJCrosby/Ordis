@@ -3,6 +3,7 @@
 __pycache__/
 *.pyc
 .env
+Ordis.code-workspace
 
 # OS/editor
 .DS_Store
