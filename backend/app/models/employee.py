@@ -17,8 +17,8 @@ class Employee(Base):
     __tablename__ = "employees"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(120), nullable=False)
     department: Mapped[DepartmentEnum] = mapped_column(Enum(DepartmentEnum, name="department_enum"), nullable=False)
     orders = relationship("Order", back_populates="service_tech", lazy="selectin")
     
-    
+    user_id = mapped_column(ForeignKey("users.id"))
+    user = relationship("User", back_populates="employee", uselist=False)

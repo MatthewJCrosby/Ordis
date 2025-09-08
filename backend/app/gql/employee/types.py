@@ -3,7 +3,9 @@ import magql
 
 GQLEmployee = magql.Object("Employee", fields={
     "id": "String!",
-    "name": "String!",
+    "user_id": "ID!",
+    "user": "User",
+    "orders": "[Order]",
     "department": "String!"
 })
 
