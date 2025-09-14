@@ -1,3 +1,4 @@
+import os
 from uuid import uuid4
 from flask import Flask, g, request
 import logging
@@ -22,14 +23,7 @@ def create_app(config_object="config.DevConfig"):
     app.config.from_object(config_object)
     app.config.from_pyfile("settings.py", silent=True)
     app.cli.add_command(cli.create_admin)
-    CORS(app, resources= {
-        r"/graphql": {
-            "origins": app.config.get("CORS_ORIGINS", ["http://localhost:3000"]),
-            "methods": ["GET", "POST", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"],
-            "supports_credentials": True
-        }
-    })
+    CORS(app, origins=os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(","), supports_credentials=True)
 
     limiter = Limiter(key_func=get_remote_address, default_limits=["500 per day", "50 per hour"])
     limiter.init_app(app)

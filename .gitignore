@@ -1,8 +1,12 @@
+# Local env files
+.env
+.env.local
+.env.*.local
+
 # Python
 .venv/
 __pycache__/
 *.pyc
-.env
 Ordis.code-workspace
 
 # OS/editor
@@ -13,3 +17,16 @@ Thumbs.db
 
 # Flask
 instance/
+
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
