@@ -36,7 +36,7 @@ def register():
     if g.db.query(User).filter_by(email=user.email).first():
         return jsonify({"message": "User with this email already exists"}), 400
     g.db.add(user)
-    g.db.flush()  # Flush to get user ID
+    g.db.flush()  
 
     if user.user_type == UserTypeEnum.CUSTOMER:
         profile = Customer(user=user)
