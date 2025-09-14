@@ -30,27 +30,27 @@ export default function Register() {
 
   return (
     <div>
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', maxWidth: 300 }}>
-        <label>
-          First Name:
-          <input name="first_name" value={form.first_name} onChange={handleChange} required />
-        </label>
-        <label>
-          Last Name:
-          <input name="last_name" value={form.last_name} onChange={handleChange} required />
-        </label>
-        <label>
-          Email:
-          <input name="email" value={form.email} onChange={handleChange} required />
-        </label>
-        <label>
-          Password:
-          <input name="password" type="password" value={form.password} onChange={handleChange} required />
-        </label>
-        <button type="submit" style={{ marginTop: 16 }}>Register</button>
-      </form>
-        {message && <p>{message}</p>}
+      <h2 className='h2-register'>Register</h2>
+      <form className="register-form" onSubmit={handleSubmit}>
+    <div className="register-form-row">
+        <label htmlFor="first_name">First Name:</label>
+        <input id="first_name" name="first_name" value={form.first_name} onChange={handleChange} required />
+    </div>
+    <div className="register-form-row">
+        <label htmlFor="last_name">Last Name:</label>
+        <input id="last_name" name="last_name" value={form.last_name} onChange={handleChange} required />
+    </div>
+    <div className="register-form-row">
+        <label htmlFor="email">Email:</label>
+        <input id="email" name="email" value={form.email} onChange={handleChange} required />
+    </div>
+    <div className="register-form-row">
+        <label htmlFor="password">Password:</label>
+        <input id="password" name="password" type="password" value={form.password} onChange={handleChange} required />
+    </div>
+    <button type="submit" style={{ marginTop: 16 }}>Register</button>
+    </form>
+        {message && <p style={{ textAlign: 'center', color: 'crimson' }}>{message}</p>}
     </div>
   );
 }

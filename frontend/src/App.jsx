@@ -26,13 +26,6 @@ function App() {
             <Route path="/users" element={<Users />} />
             <Route path="/register" element={<Register />} />
           </Routes>
-          <div className="card">
-            <button onClick={() => setCount((count) => count + 1)}>
-              count is {count}
-            </button>
-            <h1>Welcome to Oridis!</h1>
-            <p>The Order Information System</p>
-          </div>
         </main>
       </div>
     </div>
