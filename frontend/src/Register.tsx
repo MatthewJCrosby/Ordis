@@ -31,6 +31,7 @@ export default function Register() {
   return (
     <div>
       <h2 className='h2-register'>Register</h2>
+      <h3 className='h2-register'> Already have an account? <a href="/login">Login here</a></h3>
       <form className="register-form" onSubmit={handleSubmit}>
     <div className="register-form-row">
         <label htmlFor="first_name">First Name:</label>

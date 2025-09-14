@@ -15,6 +15,8 @@ class BaseConfig:
     JWT_SECRET_KEY = os.environ.get("JTW-SECRET_KEY", "dev-jwt-insecure")
     JWT_ACCESS_TOKEN_EXPIRES = 900
     JWT_REFRESH_TOKEN_EXPIRES = 86400
+    JWT_TOKEN_LOCATION = ["cookies"]
+    JWT_ACCESS_COOKIE_NAME = "access_token"
 
     DATABASE_URL = os.environ.get(
         "DATABASE_URL"

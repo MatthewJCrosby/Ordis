@@ -1,6 +1,6 @@
 import os
 from uuid import uuid4
-from flask import Flask, g, request
+from flask import Flask, app, g, request
 import logging
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -23,15 +23,16 @@ def create_app(config_object="config.DevConfig"):
     app.config.from_object(config_object)
     app.config.from_pyfile("settings.py", silent=True)
     app.cli.add_command(cli.create_admin)
-    CORS(app, origins=os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(","), supports_credentials=True)
+    origins = os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")
+    CORS(app, origins=origins, supports_credentials=True)
 
     limiter = Limiter(key_func=get_remote_address, default_limits=["500 per day", "50 per hour"])
     limiter.init_app(app)
  
     @app.before_request
-    def request_id():
+    def request_id(): 
         #assign an id, log the request, open the session
-        g.request_id = str(uuid4())
+        g.request_id = str(uuid4()) 
         app.logger.info(f"Request {g.request_id}: {request.method} {request.path}")
         g.db = get_session()
     

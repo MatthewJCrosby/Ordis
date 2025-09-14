@@ -1,11 +1,13 @@
-from flask import Blueprint, request, jsonify, g
-from sqlalchemy import func
+from flask import Blueprint, make_response, request, jsonify, g
+from sqlalchemy import func, text
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt, jwt_required, get_jwt_identity, set_access_cookies, set_refresh_cookies
 from app.models.user import User, UserTypeEnum
 from app.models.employee import Employee, DepartmentEnum
 from app import db
 from app.models.customer import Customer
+from app.models import user
+from app.models.token_blacklist import TokenBlacklist
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -58,10 +60,12 @@ def login():
 
     access_token = create_access_token(identity=str(user.id))
     refresh_token = create_refresh_token(identity=str(user.id))
-    user.last_login = func.now()
-    g.db.commit()
+    
 
-    return jsonify(access_token=access_token, refresh_token=refresh_token)
+    resp = jsonify({"msg": "Login successful"})
+    set_access_cookies(resp, access_token)
+    set_refresh_cookies(resp, refresh_token)
+    return resp
 
 @auth_bp.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
@@ -74,12 +78,13 @@ def refresh():
 @jwt_required()
 def logout():
     token_id = get_jwt()['jti']
-    g.db.execute(
-        "INSERT INTO token_blacklist (jti) VALUES (:jti)",
-        {"jti": token_id}
-    )
-    g.db.commit()
-    return jsonify({"msg": "Successfully logged out"}), 200
+    if not g.db.query(TokenBlacklist).filter_by(jti=token_id).first():
+        g.db.add(TokenBlacklist(jti=token_id))
+        g.db.commit()
+    resp = make_response(jsonify({"msg": "Successfully logged out"}))
+    resp.set_cookie("access_token", "", expires=0)
+    resp.set_cookie("refresh_token", "", expires=0)
+    return resp, 200
 
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()

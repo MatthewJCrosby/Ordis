@@ -4,6 +4,8 @@ import Sidebar from './Sidebar';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
 import Register from './Register';
+import Login from './Login';
+import Logout from './Logout';
 
 // Temporary placeholder components
 function Home() { return <h2>Home Page</h2>; }
@@ -25,6 +27,8 @@ function App() {
             <Route path="/customers" element={<Customers />} />
             <Route path="/users" element={<Users />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/logout" element={<Logout />} />
           </Routes>
         </main>
       </div>
