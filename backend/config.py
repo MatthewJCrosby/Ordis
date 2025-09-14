@@ -17,8 +17,7 @@ class BaseConfig:
     JWT_REFRESH_TOKEN_EXPIRES = 86400
 
     DATABASE_URL = os.environ.get(
-        "DATABASE_URL", 
-        "sqlite:///instance/ordis.db",
+        "DATABASE_URL"
     )
     SQL_ECHO = os.environ.get("SQL_ECHO", "false").lower() == "true"
 
