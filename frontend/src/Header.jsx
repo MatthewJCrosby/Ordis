@@ -7,7 +7,7 @@ function Header() {
   const { user } = useAuth();
 
   return (
-    <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', background: '#222', color: '#fff' }}>
+    <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem'}}>
       <img src={ordisLogo} className="logo" alt="Ordis logo" style={{ height: '2.5em' }} />
       <nav>
         {user ? (

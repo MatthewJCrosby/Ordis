@@ -42,7 +42,8 @@ header {
   color: #222;
   padding: 0rem;
   box-sizing: border-box;
-}
+  display: 'flex';
+;}
 
 .logo {
   height: 2em;

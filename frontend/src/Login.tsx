@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
 export default function Login() {
@@ -40,6 +40,7 @@ export default function Login() {
   return (
     <div>
       <h2 style={{ textAlign: 'center' }}>Login</h2>
+      <h3 className='h2-register'>Dont have an account? <Link to="/register">Register</Link></h3>
       <form className="register-form" onSubmit={handleSubmit}>
         <div className="register-form-row">
           <label htmlFor="email">Email:</label>
