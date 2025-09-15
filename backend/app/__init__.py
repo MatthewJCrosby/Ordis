@@ -5,6 +5,8 @@ import logging
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_magql import MagqlExtension
+
+from app.models.token_blacklist import TokenBlacklist
 from .gql import schema
 from .db import get_session, Base
 from flask_migrate import Migrate
@@ -20,6 +22,12 @@ migrate = Migrate(compare_type=True)
 def create_app(config_object="config.DevConfig"):
     app = Flask(__name__, instance_relative_config=True)
     jwt = JWTManager(app)
+
+    @jwt.token_in_blocklist_loader
+    def check_if_token_revoked(jwt_header, jwt_payload):
+        jti = jwt_payload["jti"]
+        return g.db.query(TokenBlacklist).filter_by(jti=jti).first() is not None
+    
     app.config.from_object(config_object)
     app.config.from_pyfile("settings.py", silent=True)
     app.cli.add_command(cli.create_admin)
