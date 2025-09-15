@@ -6,6 +6,7 @@ import './App.css';
 import Register from './Register';
 import Login from './Login';
 import Logout from './Logout';
+import MyAccount from './pages/MyAccount';
 
 // Temporary placeholder components
 function Home() { return <h2>Home Page</h2>; }
@@ -29,6 +30,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/logout" element={<Logout />} />
+            <Route path="/me" element={<MyAccount />} />
           </Routes>
         </main>
       </div>
