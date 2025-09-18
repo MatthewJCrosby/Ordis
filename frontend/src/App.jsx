@@ -7,7 +7,8 @@ import Register from './Register';
 import Login from './Login';
 import Logout from './Logout';
 import MyAccount from './pages/MyAccount';
-
+import ProductCreate from './pages/Product/ProductCreate';
+import ProductEdit from './pages/Product/ProductEdit';
 // Temporary placeholder components
 function Home() { return <h2>Home Page</h2>; }
 function Customers() { return <h2>Customers Page</h2>; }
@@ -31,6 +32,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/logout" element={<Logout />} />
             <Route path="/me" element={<MyAccount />} />
+            <Route path="/product/create" element={<ProductCreate />} />
+            <Route path="/product/edit/:id" element={<ProductEdit />} />
           </Routes>
         </main>
       </div>

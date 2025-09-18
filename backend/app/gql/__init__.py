@@ -17,6 +17,7 @@ from .order import mutations as _order_mutations
 from .line_item import types as _line_item_types
 from .line_item import queries as _line_item_queries
 from .line_item import mutations as _line_item_mutations
+from .user import types as _user_types
 
 from .scalars import DecimalType
 schema.add_type(DecimalType)
