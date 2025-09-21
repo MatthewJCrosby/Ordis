@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { CREATE_PRODUCT, UPDATE_PRODUCT } from "./queries";
+import { CREATE_PRODUCT, DELETE_PRODUCT, UPDATE_PRODUCT } from "./queries";
 import { graphqlRequest } from "../../api";
 
 type Product ={
@@ -66,6 +66,23 @@ export default function ProductForm({ initialValues, editMode = false, onSuccess
     setMessage("Network error.");
   }
 }
+
+async function handleDelete() {
+    if (!form.id) return;
+    if (!window.confirm("Are you sure you want to delete this product?")) return;
+    try {
+      const result = await graphqlRequest(DELETE_PRODUCT(form.id));
+      if (result.data?.deleteProduct) {
+        setMessage("Product deleted!");
+        if (onSuccess) onSuccess(result.data.deleteProduct);
+      } else {
+        setMessage(result.errors?.[0]?.message || "Delete failed.");
+      }
+    } catch {
+      setMessage("Network error.");
+    }
+  }
+  
   return (
     <div className="card-form">
   <div className="card-form-header">
@@ -91,6 +108,15 @@ export default function ProductForm({ initialValues, editMode = false, onSuccess
         </button>
       )}
       <button type="submit">{editMode ? "Save" : "Create"}</button>
+          {editMode && (
+            <button
+              type="button"
+              onClick={handleDelete}
+              style={{ marginLeft: 8, background: "crimson", color: "#fff" }}
+            >
+              Delete
+            </button>
+          )}
     </div>
     {message && <p style={{ color: "crimson" }}>{message}</p>}
   </form>

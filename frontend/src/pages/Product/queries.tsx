@@ -57,8 +57,6 @@ export const UPDATE_PRODUCT = (id: string | number, name: string, description: s
 // Mutation: Delete a product
 export const DELETE_PRODUCT = (id: string | number) => `
   mutation {
-    deleteProduct(id: ${id}) {
-      id
-    }
+    deleteProduct(id: ${id}) 
   }
 `;
