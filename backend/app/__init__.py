@@ -34,7 +34,7 @@ def create_app(config_object="config.DevConfig"):
     origins = os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(",")
     CORS(app, origins=origins, supports_credentials=True)
 
-    limiter = Limiter(key_func=get_remote_address, default_limits=["500 per day", "50 per hour"])
+    limiter = Limiter(key_func=get_remote_address, default_limits=["5000 per day", "500 per hour"])
     limiter.init_app(app)
  
     @app.before_request
@@ -101,7 +101,7 @@ def create_app(config_object="config.DevConfig"):
     
 
     @app.get("/")
-    @limiter.limit("10 per minute")
+    @limiter.limit("100 per minute")
     def home():
         return {"status": "ok"}
     

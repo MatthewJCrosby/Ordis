@@ -1,4 +1,6 @@
 import React, {useState, useEffect} from "react";
+import { CREATE_PRODUCT, UPDATE_PRODUCT } from "./queries";
+import { graphqlRequest } from "../../api";
 
 type Product ={
     id?: number;
@@ -37,43 +39,20 @@ export default function ProductForm({ initialValues, editMode = false, onSuccess
   setMessage("");
   try {
     const mutation = editMode
-      ? `
-        mutation {
-          updateProduct(id: ${form.id}, input: {
-            name: "${form.name}",
-            description: "${form.description}",
-            price: ${parseFloat(form.price)}
-          }) {
-            id
-            name
-            description
-            price
-          }
-        }
-      `
-      : `
-        mutation {
-          createProduct(input: {
-            name: "${form.name}",
-            description: "${form.description}",
-            price: ${parseFloat(form.price)}
-          }) {
-            id
-            name
-            description
-            price
-          }
-        }
-      `;
+      ? UPDATE_PRODUCT(
+        form.id!,
+        form.name,
+        form.description,
+        parseFloat(form.price)
+      )
+      : CREATE_PRODUCT(
+        form.name,
+        form.description,
+        parseFloat(form.price)
+      )
 
-    const response = await fetch('http://localhost:5000/graphql', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: mutation }),
-      credentials: "include",
-    });
-
-    const result = await response.json();
+    const result = await graphqlRequest(mutation);
+    
     const data = editMode ? result.data.updateProduct : result.data.createProduct;
 
     if (data) {
@@ -88,29 +67,33 @@ export default function ProductForm({ initialValues, editMode = false, onSuccess
   }
 }
   return (
-    <div>
-      <h2>{editMode ? "Edit Product" : "Create Product"}</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name:</label>
-          <input name="name" value={form.name} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Description:</label>
-          <textarea name="description" value={form.description} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Price:</label>
-          <input name="price" type="number" step="0.01" value={form.price} onChange={handleChange} required />
-        </div>
-        {onCancel && (
-          <button type="button" onClick={onCancel} style={{ marginRight: 8 }}>
-            Cancel
-          </button>
-        )}
-        <button type="submit">{editMode ? "Save" : "Create"}</button>
-      </form>
-      {message && <p style={{ color: "crimson" }}>{message}</p>}
+    <div className="card-form">
+  <div className="card-form-header">
+    {editMode ? "Edit Product" : "Create Product"}
+  </div>
+  <form className="card-form-body" onSubmit={handleSubmit}>
+    <div className="card-form-row">
+      <label>Name:</label>
+      <input name="name" value={form.name} onChange={handleChange} required />
     </div>
+    <div className="card-form-row">
+      <label>Description:</label>
+      <textarea name="description" value={form.description} onChange={handleChange} />
+    </div>
+    <div className="card-form-row">
+      <label>Price:</label>
+      <input name="price" type="number" step="0.01" value={form.price} onChange={handleChange} required />
+    </div>
+    <div>
+      {editMode && onCancel && (
+        <button type="button" onClick={onCancel} style={{ marginRight: 8 }}>
+          Cancel
+        </button>
+      )}
+      <button type="submit">{editMode ? "Save" : "Create"}</button>
+    </div>
+    {message && <p style={{ color: "crimson" }}>{message}</p>}
+  </form>
+</div>
   );
 }
